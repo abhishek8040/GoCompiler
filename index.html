@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Compiler</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='gocompiler.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.24.1/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.24.1/ext-language_tools.js"></script>
+</head>
+<body class="dark">
+    <div class="container">
+        <div class="toolbar">
+            <!-- 👇 Website name added here -->
+    <div class="toolbar-title">  GO COMPILER 🚀 </div>
+            <select id="language-select">
+                <option value="python">Python</option>
+                <option value="c">C</option>
+                <option value="cpp">C++</option>
+                <option value="java">Java</option>
+            </select>
+            <button id="theme-toggle">
+                <span class="theme-icon">🌙</span>
+                Dark Mode
+            </button>
+            <button id="clear-editor">
+                <span class="clear-icon">🗑️</span>
+                Clear
+            </button>
+            <button id="download-code">
+                <span class="download-icon">⬇️</span>
+                Download
+            </button>
+            <a href="https://chat-weld-theta.vercel.app/" target="_blank">
+                <button>Chat</button>
+          </a>
+          <a href="{{ url_for('about') }}" target="_blank">
+                <button> About </button>
+          </a>
+
+            <button id="run-code">
+                <span class="run-icon">▶️</span>
+                Run
+            </button>
+            <button id="improve-code">
+                <span class="improve-icon">🔍</span>
+                Improve Code
+            </button>
+            <button id="generate-code">
+                <span class="generate-icon">✨</span>
+                Generate Code
+            </button>
+        </div>
+
+        <div class="main-content">
+            <div class="editor-container">
+                <div id="code-editor"># Write your code here...</div>
+            </div>
+
+            <div class="output-container">
+                <h3>Console</h3>
+                <div id="output-console"></div>
+            </div>
+        </div>
+    </div>
+    <div id="ai-chat-container" class="ai-chat-container hidden">
+        <div class="chat-header">
+            <h3>AI Code Assistant</h3>
+            <button id="close-chat">×</button>
+        </div>
+        <div id="chat-messages"></div>
+        <div class="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Describe the code you want...">
+            <button id="send-message">Send</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

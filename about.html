@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About | Go Compiler</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            background-color: #f9f9f9;
+        }
+        .highlight {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .section-title {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #007bff;
+            display: inline-block;
+        }
+        .faq-question {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Add menu strip/navbar here -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">Go Compiler</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('index') }}"><b>Home</b> </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="contactDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Contact
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="contactDropdown">
+            <li>
+              <a class="dropdown-item" href="mailto:abhishekdubey8040@gmail.com">
+                <span class="me-2">📧</span>Email
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="https://www.linkedin.com/in/abhishekdubey-/" target="_blank">
+                <span class="me-2">🔗</span>LinkedIn
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('about') }}">About</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    <h1 class="text-center mb-4">👨‍💻 About <span class="highlight">Go Compiler</span></h1>
+    <p class="lead text-center">Run Your Code. Anywhere. Anytime.</p>
+
+    <p>Welcome to <span class="highlight">Go Compiler</span> — your portable programming playground in the cloud! Whether you're a student practicing your first "Hello, World!" or a seasoned developer testing algorithms on the go, Go Compiler is built to make coding fast, easy, and accessible from anywhere in the world.</p>
+
+    <h3 class="section-title">🚀 What is Go Compiler?</h3>
+    <p><strong>Go Compiler</strong> is a powerful, lightweight, and user-friendly <strong>online code compiler and interpreter</strong> designed for multiple programming languages. It allows users to <strong>write, compile, execute and generate code in real time</strong> — all from within their web browser.</p>
+
+    <h3 class="section-title">🌟 Key Features</h3>
+    <ul>
+        <li>🧠 <strong>Multi-Language Support:</strong> C, C++, Python, Java, JavaScript, Go (and more coming!)</li>
+        <li>⚡ <strong>Fast Execution:</strong> Quick, responsive backend</li>
+        <li>⚡ <strong>Generative AI:</strong> Generate any code, or Improve your code in a single tap.</li>
+        <li>🌍 <strong>Platform Independent:</strong> Works on mobile, tablet, and desktop</li>
+        <li>📁 <strong>Save and Share:</strong> Copy/download/share your code easily</li>
+        <li>🛡️ <strong>Safe Sandbox:</strong> Secure and private execution environment</li>
+        <li>🧑‍🎓 <strong>Beginner-Friendly:</strong> Clean, intuitive interface</li>
+        <li>🎨 <strong>Dark/Light Mode:</strong> Choose your coding vibe</li>
+    </ul>
+
+    <h3 class="section-title">🎯 Our Vision</h3>
+    <p>To democratize programming by providing an <strong>open, free, and accessible online compiler</strong> that empowers students, educators, developers, and hobbyists to learn, experiment, and create — anytime, anywhere.</p>
+
+    <h3 class="section-title">👥 Meet the Creator</h3>
+    <p>This project was conceptualized and developed by <strong>Abhishek Dubey</strong>, a passionate developer and tech enthusiast.</p>
+
+    <h3 class="section-title">❓ Frequently Asked Questions (FAQ)</h3>
+    <div class="mb-3">
+        <p class="faq-question">Q. Is Go Compiler free to use?</p>
+        <p>A. <strong>Yes!</strong> It’s completely free. No login or payment required.</p>
+
+        <p class="faq-question">Q. What programming languages are supported?</p>
+        <p>A. Currently: C, C++, Python, Java, JavaScript, and Go.</p>
+
+        <p class="faq-question">Q. Can I use it on mobile?</p>
+        <p>A. Absolutely. It's fully mobile-responsive.</p>
+
+        <p class="faq-question">Q. Is my code saved?</p>
+        <p>A. No. Your code is not stored unless we add account support in the future.</p>
+
+        <p class="faq-question">Q. Is it safe?</p>
+        <p>A. Yes. Code runs in secure, isolated environments.</p>
+
+        <p class="faq-question">Q. Is it can Generate any Code?</p>
+        <p>A. Yes. It is using Huggingface Opensource API but it is capable of generating any code.</p>
+
+        <p class="faq-question">Q. Can I contribute?</p>
+        <p>A. Soon! We'll open source the project on GitHub for collaboration. Or you can contact me on email.</p>
+    </div>
+
+    <h3 class="section-title">🔧 Tech Stack</h3>
+    <ul>
+        <li><strong>Frontend:</strong> HTML, CSS, JavaScript, Bootstrap</li>
+        <li><strong>Backend:</strong> Python (Flask), Shell Scripts, Generative AI (HuggingFace API)</li>
+        <li><strong>Execution:</strong> Dockerized sandbox environments</li>
+        <li><strong>Hosting:</strong> PythonAnywhere (GitHub integration coming soon)</li>
+    </ul>
+
+    <h3 class="section-title">🛠️ What's Coming Next?</h3>
+    <ul>
+        <li>📝 User login & code history</li>
+        <li>📝 Advanced UI</li>
+        <li>🎯 Competitive coding mode</li>
+        <li>🌐 Public API for embedding compiler</li>
+        <li>💾 Cloud storage support</li>
+        <li>🗣️ Voice-controlled coding (experimental)</li>
+    </ul>
+
+    <h3 class="section-title">📫 Contact Us</h3>
+    <p>Have suggestions or want to collaborate?</p>
+    <ul>
+        <li><strong>Email:</strong> abhishekdubey8040@gmail.com</li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/abhishek8040" target="_blank">github.com/abhishek8040</a> </li>
+        <li><strong>Linkedin:</strong> <a href="https://www.linkedin.com/in/abhishekdubey-/" target="_blank">Abhishek Dubey</a></li>
+    </ul>
+
+    <blockquote class="blockquote mt-5 text-center">
+        <p>💡 "The best code is the one that inspires someone else to write."</p>
+        <footer class="blockquote-footer">Let Go Compiler be the place where your ideas turn into code.</footer>
+    </blockquote>
+</div>
+
+<!-- Bootstrap Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
