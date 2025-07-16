@@ -103,7 +103,7 @@ This project is licensed under the [MIT License](LICENSE).
 ## 👤 Author
 
 **Abhishek Dubey**
-📧 \[[YourEmail@example.com](mailto:abhishekdubey8040.com)]
+📧 \[[abhishekdubey8040@gmail.com](mailto:abhishekdubey8040@gmail.com)]
 🔗 [LinkedIn](https://linkedin.com/in/your-profile) • [Portfolio](https://your-portfolio.com)
 
 ---
