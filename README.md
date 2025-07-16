@@ -1,9 +1,7 @@
 
 ````
 # 🌐 Online Code Compiler
-<a href="https://abhishek8040.pythonanywhere.com/" target="_blank">
-  <img src="https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge" alt="Live Demo"/>
-</a>
+
 
 A powerful and simple **web-based code compiler** that supports multiple programming languages like **Python, C, C++, Java**, and more. Users can write, compile, and run code directly in the browser — with real-time suggestions and AI-powered code generation.
 
