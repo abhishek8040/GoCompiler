@@ -11,7 +11,7 @@ A powerful and simple **web-based code compiler** that supports multiple program
 - ✅ **Multi-language Support** – Compile and run Python, C, C++, and Java code.
 - ✍️ **Online Editor** – Write and edit code using a responsive, browser-based editor.
 - ⚡ **Real-time Code Suggestions** – Get syntax hints and code improvements as you type.
-- 🤖 **AI Code Generation** – Generate starter code or snippets using integrated APIs.
+- 🤖 **AI Code Generation** – Generate starter code or snippets using integrated HuggingFace APIs.
 - 🌐 **No Installation Needed** – Fully online and accessible from any device.
 - 🔐 **Safe Execution Environment** – Isolated backend execution (via Docker or safe subprocess).
 
@@ -46,6 +46,11 @@ cd online-code-compiler
 # Create a virtual environment and activate it
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Add your HuggingFace API Key in the given field of app.py
+
+replace the api key with your own HF api key
+
 
 # Install dependencies
 pip install -r requirements.txt
