@@ -1,5 +1,4 @@
 
-
 # 🌐 Online Code Compiler
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://abhishek8040.pythonanywhere.com)
@@ -30,17 +29,21 @@ A powerful and simple **web-based code compiler** that supports multiple program
 | **Frontend** | HTML, CSS, JavaScript, [CodeMirror](https://codemirror.net/) or Monaco Editor |
 | **Backend**  | Python, Flask        |
 | **Compiler APIs** | Custom Flask routes or third-party APIs like JDoodle, HackerEarth API, etc. |
-| **Optional** | Docker (for secure code execution), REST APIs |
+| **HuggingFace API** | Huggingface APIs for code generation |
 
 ---
 
 ## 📷 Demo
 
-![Online Compiler Demo] <!-- https://abhishek8040.pythonanywhere.com/ -->
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://abhishek8040.pythonanywhere.com)
+
+🔗 **Live Demo:** [Click here to try it!] (https://abhishek8040.pythonanywhere.com)
 
 Try writing and running code directly in your browser!
 
 ---
+
+
 
 ## 🧑‍💻 How to Run Locally
 
@@ -69,6 +72,8 @@ Open your browser and go to `http://localhost:5000`
 
 ---
 
+
+
 ## 📁 Project Structure
 
 ```
@@ -85,11 +90,13 @@ online-code-compiler/
 
 ---
 
+
+
 ## 💡 Future Enhancements
 
 * [ ] Add user authentication (Login/Signup)
-* [ ] Save and share code snippets
-* [ ] Add dark/light themes
+* [ ] Fixing problems related to User's Input 
+* [ ] Enhance Generative AI Chat
 * [ ] Support for more languages (e.g., JavaScript, Go, Ruby)
 
 ---
@@ -110,7 +117,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 **Abhishek Dubey**
 📧 \[[abhishekdubey8040@gmail.com](mailto:abhishekdubey8040@gmail.com)]
-🔗 [LinkedIn](https://linkedin.com/in/your-profile) • [Portfolio](https://your-portfolio.com)
+🔗 [LinkedIn](https://www.linkedin.com/in/abhishekdubey-) • [Portfolio](https://your-portfolio.com)
 
 ---
 
