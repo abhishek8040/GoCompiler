@@ -120,8 +120,3 @@ This project is licensed under the [MIT License](LICENSE).
 🔗 [LinkedIn](https://www.linkedin.com/in/abhishekdubey-) • [Portfolio](https://abhishek8040.github.io/portfolio/)
 
 ---
-
-```
-
-Let me know if you'd like help customizing the demo image link, contribution guidelines, or adding an actual deployment (e.g., on Render or Vercel).
-```
