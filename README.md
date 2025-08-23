@@ -117,7 +117,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 **Abhishek Dubey**
 📧 \[[abhishekdubey8040@gmail.com](mailto:abhishekdubey8040@gmail.com)]
-🔗 [LinkedIn](https://www.linkedin.com/in/abhishekdubey-) • [Portfolio](https://your-portfolio.com)
+🔗 [LinkedIn](https://www.linkedin.com/in/abhishekdubey-) • [Portfolio](https://abhishek8040.github.io/portfolio/)
 
 ---
 
