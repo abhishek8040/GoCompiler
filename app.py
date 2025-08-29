@@ -1,6 +1,6 @@
 import requests
 import select
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import subprocess
 import os
@@ -11,19 +11,16 @@ import re
 from typing import List, Dict
 from collections import defaultdict
 
+
+
+# Hugging Face OpenAI-compatible endpoint and model
+HUGGINGFACE_API_KEY = "yourapikey"  # Replace with your valid token
+HUGGINGFACE_API_URL = "https://router.huggingface.co/v1/chat/completions"
+HUGGINGFACE_MODEL = "openai/gpt-oss-20b:novita"  # You can change to another available model
+
+                       
 app = Flask(__name__)
 CORS(app)
-
-
-
-HUGGINGFACE_API_KEY = "your api here"   #tempemail
-
-#HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/codellama/CodeLlama-34b-Instruct-hf"
-
-#HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/Qwen/QwQ-32B-Preview"                #working good
-HUGGINGFACE_API_URL =    "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-Coder-32B-Instruct"
-
-
 
 class CodeExecutionError(Exception):
     pass
@@ -44,17 +41,10 @@ def run_with_timeout(process, timeout=10):
             process.kill()
         except ProcessLookupError:
             pass
-
+    
     thread = threading.Thread(target=kill_process)
     thread.daemon = True
     thread.start()
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
 
 @app.route('/run_code', methods=['POST'])
 def run_code():
@@ -78,6 +68,7 @@ def run_code():
 
 
 def handle_python_execution(code, user_inputs):
+
     try:
         temp_file = 'temp_script.py'
         with open(temp_file, 'w') as f:
@@ -95,45 +86,35 @@ def handle_python_execution(code, user_inputs):
         output_buffer = []
         input_index = 0
 
-        def read_output():
-            """Read output until input is needed"""
-            try:
+        # Read output until input is needed or process ends
+        while True:
+            # Use select to check for output
+            ready = select.select([process.stdout], [], [], 0.2)[0]
+            if ready:
                 line = process.stdout.readline()
                 if line:
-                    return line.rstrip()
-            except:
-                pass
-            return None
-
-        # Process line by line
-        while True:
-            # Read output until input prompt
-            while True:
-                line = read_output()
-                if not line:
-                    break
-                output_buffer.append(line)
-                if 'input' in code and not line.endswith('input'):
-                    break
-
-            # Check if process has ended
+                    output_buffer.append(line.rstrip('\n'))
+            # If process is waiting for input
             if process.poll() is not None:
                 break
 
-            # Check if input is needed
-            if input_index < len(user_inputs):
-                process.stdin.write(f"{user_inputs[input_index]}\n")
-                process.stdin.flush()
-                input_index += 1
-            else:
-                # Need more input
-                if code.count('input(') > input_index:
+            # If code expects more input than provided
+            if code.count('input(') > input_index:
+                if input_index < len(user_inputs):
+                    # Send user input
+                    process.stdin.write(f"{user_inputs[input_index]}\n")
+                    process.stdin.flush()
+                    input_index += 1
+                else:
+                    # Prompt frontend for input
                     cleanup_files(temp_file)
                     return jsonify({
                         'output': '\n'.join(output_buffer),
                         'error': '',
                         'input_required': True
                     })
+            else:
+                # No more input expected
                 break
 
         # Get remaining output
@@ -149,7 +130,10 @@ def handle_python_execution(code, user_inputs):
         })
 
     except Exception as e:
-        cleanup_files(temp_file)
+        try:
+            cleanup_files(temp_file)
+        except Exception:
+            pass
         return jsonify({'error': str(e), 'input_required': False})
 
 
@@ -223,7 +207,7 @@ def handle_cpp_execution(code, user_inputs):
                 for input_value in user_inputs:
                     process.stdin.write(f"{input_value}\n")
                     process.stdin.flush()
-
+                    
                     # Read output after input
                     while True:
                         line = read_output()
@@ -309,7 +293,7 @@ def handle_c_execution(code, user_inputs):
         try:
             # Initial read to get first prompt
             read_until_input()
-
+            
             # Need first input?
             if expected_inputs > received_inputs:
                 cleanup_files('temp.c', './temp')
@@ -325,10 +309,10 @@ def handle_c_execution(code, user_inputs):
                     # Send input
                     process.stdin.write(f"{input_value}\n")
                     process.stdin.flush()
-
+                    
                     # Read output until next input needed
                     read_until_input()
-
+                    
                     # Check if we need more input
                     if len(user_inputs) < expected_inputs:
                         cleanup_files('temp.c', './temp')
@@ -474,15 +458,7 @@ def format_output(output):
     return '\n'.join(line.rstrip() for line in lines)
 
 BOILERPLATE_CODE = {
-    'python': '''# Write your Python code here...
-
-
-print("Welcome to Go Compiler")
-
-print("Best on the go Online Compiler")
-
-# Click Clear button to erase...
-''' ,
+    'python': '''# Python code here...''',
     'c': '''#include <stdio.h>
 
 int main() {
@@ -518,14 +494,14 @@ def download_code():
     data = request.get_json()
     language = data.get('language', 'python')
     code = data.get('code', '')
-
+    
     file_extensions = {
         'python': '.py',
         'c': '.c',
         'cpp': '.cpp',
         'java': '.java'
     }
-
+    
     filename = f"code{file_extensions.get(language, '.txt')}"
     return jsonify({
         'filename': filename,
@@ -533,69 +509,54 @@ def download_code():
     })
 
 def analyze_code(code: str, language: str) -> str:
-    """Analyze code and provide improvement suggestions using AI"""
+    """Analyze code and provide improvement suggestions using AI (OpenAI format)"""
     headers = {
         "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
         "Content-Type": "application/json"
     }
-
-    prompt = f"""Analyze the following {language} code:
-
-{code}
-
-And Please provide specific suggestions for:
-1. Code correctness
-2. Optimized approaches
-
-
-
-Format your response in clear sections using markdown, with examples where relevant."""
-
+    prompt = f"""Analyze the following {language} code:\n\n{code}\n\nAnd Please provide specific suggestions for:\n1. Code correctness\n2. Optimized approaches\n\nFormat your response in clear sections using markdown, with examples where relevant."""
+    data = {
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "model": HUGGINGFACE_MODEL,
+        "stream": False
+    }
     try:
         response = requests.post(
             HUGGINGFACE_API_URL,
             headers=headers,
-            json={
-                "inputs": prompt,
-                "parameters": {
-                    "max_new_tokens": 1000,
-                    "temperature": 0.7,
-                    "top_p": 0.95,
-                    "do_sample": True,
-                    "return_full_text": False
-                }
-            },
-            timeout=30
+            json=data,
+            timeout=60
         )
-
         if response.status_code == 200:
-            suggestions = response.json()[0]["generated_text"]
+            result = response.json()
+            suggestions = result["choices"][0]["message"]["content"]
             return format_suggestions(code, suggestions)
         else:
             return f"// Error: Analysis failed (Status: {response.status_code})"
-
     except Exception as e:
         return f"// Error during analysis: {str(e)}"
-
+   
 def format_suggestions(code: str, suggestions: str) -> str:
     """Format the analysis output with syntax highlighting and clear sections"""
     result = []
     result.append("<div class='code-suggestions'>")
     result.append("<h2>🔍 Code Analysis Report</h2>")
     result.append("<hr>")
-
+    
     # Add original code
     result.append("<h3>📌 Original Code:</h3>")
     result.append(f"<pre class='code-block'>{code}</pre>")
-
+    
     # Clean and format suggestions
     suggestions = suggestions.replace("```", "").strip()
-
+    
     # Add section headers
     sections = []
-
+    
     result.append("<h3>💡 Analysis & Suggestions:</h3>")
-
+    
     # Format each detected section
     found_sections = False
     for section in sections:
@@ -603,7 +564,7 @@ def format_suggestions(code: str, suggestions: str) -> str:
             found_sections = True
             result.append(f"<h4>🔸 {section}:</h4>")
             # Extract relevant part of suggestions for this section
-            section_pattern = re.compile(f"{section}:?(.*?)(?={sections[0]}|$)",
+            section_pattern = re.compile(f"{section}:?(.*?)(?={sections[0]}|$)", 
                                       re.IGNORECASE | re.DOTALL)
             matches = section_pattern.findall(suggestions)
             if matches:
@@ -611,11 +572,11 @@ def format_suggestions(code: str, suggestions: str) -> str:
                 # Format bullet points
                 content = re.sub(r'^[\-\*]\s*', '• ', content, flags=re.MULTILINE)
                 result.append(f"<p>{content}</p>")
-
+    
     # If no sections were found in AI response, just append the raw suggestions
     if not found_sections:
         result.append(f"<p>{suggestions}</p>")
-
+    
     result.append("</div>")
     return ''.join(result)
 
@@ -625,7 +586,7 @@ def improve_code():
     data = request.get_json()
     language = data.get('language', '')
     code = data.get('code', '')
-
+    
     suggestions = analyze_code(code, language)
     return jsonify({'suggestions': suggestions})
 
@@ -645,7 +606,7 @@ print(arr)  # [0, 0, 0, 0, 0]''',
     return new int[size];
 }'''
     }),
-
+    
     # Algorithms
     'sort': defaultdict(lambda: 'No template', {
         'python': '''def bubble_sort(arr):
@@ -663,7 +624,7 @@ print(arr)  # [0, 0, 0, 0, 0]''',
                 swap(arr[j], arr[j+1]);
 }'''
     }),
-
+    
     # File Operations
     'file': defaultdict(lambda: 'No template', {
         'python': '''def read_file(filename):
@@ -683,41 +644,35 @@ def write_file(filename, content):
 }
 
 def generate_code_from_api(prompt, language):
-    """Generate code using Hugging Face API"""
+    """Generate code using Hugging Face OpenAI-compatible API"""
     headers = {
         "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
         "Content-Type": "application/json"
     }
-
-    # More specific prompt for better code generation
     formatted_prompt = (
-        f"Write {language} code for: {prompt} , start code from first line, use inline comments.\n"
-
+        f"Write a complete {language} implementation for exactly this task: {prompt}\n"
+        "Only return the working code without explanations or any line. "
     )
-
+    data = {
+        "messages": [
+            {"role": "user", "content": formatted_prompt}
+        ],
+        "model": HUGGINGFACE_MODEL,
+        "stream": False
+    }
     try:
         response = requests.post(
             HUGGINGFACE_API_URL,
             headers=headers,
-            json={
-                "inputs": formatted_prompt,
-                "parameters": {
-                    "max_new_tokens": 800,  # Increased token limit
-                    "temperature": 0.3,     # Lower temperature for more focused output
-                    "top_p": 0.95,
-                    "do_sample": True,
-                    "return_full_text": False
-                }
-            },
+            json=data,
             timeout=30
         )
-
         if response.status_code == 200:
-            generated_text = response.json()[0]["generated_text"]
+            result = response.json()
+            generated_text = result["choices"][0]["message"]["content"]
             return extract_clean_code(generated_text, language)
         else:
             return f"// Error: API request failed (Status: {response.status_code})"
-
     except Exception as e:
         return f"// Error: {str(e)}"
 
@@ -726,13 +681,13 @@ def extract_clean_code(text, language):
     # Remove markdown code blocks
     code = re.sub(r'```.*?\n', '', text)
     code = re.sub(r'```', '', code)
-
+    
     # Remove explanatory text
     lines = []
     for line in code.split('\n'):
         if line.strip() and not line.startswith(('Here', 'This', '//', '#')):
             lines.append(line)
-
+    
     return '\n'.join(lines).strip()
 
 def remove_duplicate_code(code):
@@ -741,101 +696,89 @@ def remove_duplicate_code(code):
     blocks = [block.strip() for block in code.split('\n\n') if block.strip()]
     unique_blocks = []
     seen = set()
-
+    
     for block in blocks:
         if block not in seen:
             unique_blocks.append(block)
             seen.add(block)
-
+            
     return '\n\n'.join(unique_blocks)
 @app.route('/generate_code', methods=['POST'])
-
 def generate_code():
     data = request.get_json()
     prompt = data.get('prompt', '').strip()
     language = data.get('language', 'python')
 
     if not prompt:
-        return jsonify({'error': 'No prompt provided'})
+        return jsonify({'code': '', 'error': 'No prompt provided'})
 
     try:
-        # Format prompt for better code generation
         formatted_prompt = (
             f"Write complete, working {language} code for: {prompt}\n"
             "Return only the code implementation without any explanations."
         )
-
-        # Call API with formatted prompt
         headers = {
             "Authorization": f"Bearer {HUGGINGFACE_API_KEY}",
             "Content-Type": "application/json"
         }
-
+        data_payload = {
+            "messages": [
+                {"role": "user", "content": formatted_prompt}
+            ],
+            "model": HUGGINGFACE_MODEL,
+            "stream": False
+        }
         response = requests.post(
             HUGGINGFACE_API_URL,
             headers=headers,
-            json={
-                "inputs": formatted_prompt,
-                "parameters": {
-                    "max_new_tokens": 1000,
-                    "temperature": 0.3,
-                    "top_p": 0.95,
-                    "do_sample": True,
-                    "return_full_text": False
-                }
-            },
+            json=data_payload,
             timeout=30
         )
-
         if response.status_code == 200:
-            generated_code = response.json()[0]["generated_text"]
-
-            # Clean up generated code
+            result = response.json()
+            generated_code = result["choices"][0]["message"]["content"]
             generated_code = extract_clean_code(generated_code, language)
-
-            # Add basic structure if missing
             generated_code = format_code_structure(generated_code, language)
-
             return jsonify({
                 'code': generated_code,
-                'language': language
+                'language': language,
+                'error': ''
             })
         else:
-            return jsonify({'error': f'API request failed: {response.status_code}'})
-
+            return jsonify({'code': '', 'error': f'API request failed: {response.status_code}'})
     except Exception as e:
-        return jsonify({'error': f'Error generating code: {str(e)}'})
+        return jsonify({'code': '', 'error': f'Error generating code: {str(e)}'})
+
 def format_code_structure(code, language):
     """Add basic code structure if missing"""
     if not code:
         return code
-
+        
     if language == 'python':
         if not any(keyword in code for keyword in ['def ', 'class ']):
-            indented_code = '\n    '.join(code.split('\n'))
-            code = f"def main():\n    {indented_code}"
+            code = f"def main():\n    {code.replace('\n', '\n    ')}"
             if 'if __name__' not in code:
                 code += "\n\nif __name__ == '__main__':\n    main()"
-
+                
     elif language == 'java':
         if 'class' not in code:
-            indented_code = '\n        '.join(code.split('\n'))
             code = f"""public class Main {{
     public static void main(String[] args) {{
-        {indented_code}
+        {code.replace('\n', '\n        ')}
     }}
 }}"""
-
+            
     elif language in ['c', 'cpp']:
         includes = '#include <iostream>\nusing namespace std;\n\n' if language == 'cpp' else '#include <stdio.h>\n\n'
         if 'main' not in code:
-            indented_code = '\n    '.join(code.split('\n'))
             code = f"""{includes}int main() {{
-    {indented_code}
+    {code.replace('\n', '\n    ')}
     return 0;
 }}"""
-
+            
     return code
+
+
 # Add this at the top of app.py with other constants
 KEYWORDS = {
     'array': ['array', 'list', 'vector'],
@@ -845,4 +788,18 @@ KEYWORDS = {
 
 # Add this at the bottom of app.py
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        # Run Flask app with debug mode
+        app.run(
+            host='0.0.0.0',  # Allow external connections
+            port=5000,       # Use port 5000
+            debug=True       # Enable debug mode for development
+        )
+    except OSError as e:
+        if 'Address already in use' in str(e):
+            print("Error: Port 5000 is already in use.")
+            print("Try these commands:")
+            print("lsof -i :5000    # Find process using port 5000")
+            print("kill -9 <PID>    # Kill the process")
+        else:
+            print(f"Error starting server: {e}")
